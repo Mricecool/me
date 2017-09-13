@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <include
+        android:id="@+id/top"
+        layout="@layout/layout_pal_top" />
+
+
+    <Button
+        android:id="@+id/btn_ok"
+        style="@style/item_bottom_bt"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:text="完 成" />
+
+    <GridView
+        android:id="@+id/grid_img"
+        android:layout_below="@+id/top"
+        android:layout_above="@+id/btn_ok"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:horizontalSpacing="2dp"
+        android:verticalSpacing="2dp"
+        android:numColumns="3"
+        ></GridView>
+</RelativeLayout>
