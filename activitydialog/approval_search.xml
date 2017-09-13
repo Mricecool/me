@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:background="@drawable/dialog_bg"
+    android:gravity="center"
+    android:minWidth="280dip"
+    android:orientation="vertical"
+    tools:context=".context.EditStationActivity">
+
+    <include
+        layout="@layout/layout_pal_top"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout style="@style/item_wrap_ll">
+
+                <TextView
+                    android:id="@+id/edit_station_title_tv"
+                    style="@style/item_left_tv"
+                    android:layout_margin="12dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:text="审批结果查询" />
+
+            </LinearLayout>
+
+            <ImageView style="@style/item_line_im1" />
+
+            <LinearLayout
+                style="@style/item_bar_ll"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    style="@style/item_left_tv"
+                    android:text="地级市" />
+
+                <TextView
+                    android:id="@+id/txt_djs"
+                    style="@style/item_right_tv"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <ImageView style="@style/item_line_im1" />
+
+            <LinearLayout
+                style="@style/item_bar_ll"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    style="@style/item_left_tv"
+                    android:text="加油站" />
+
+                <TextView
+                    android:id="@+id/txt_jyz"
+                    style="@style/item_right_tv"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <ImageView style="@style/item_line_im1" />
+
+            <LinearLayout
+                style="@style/item_bar_ll"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    style="@style/item_left_tv"
+                    android:text="油品" />
+
+                <TextView
+                    android:id="@+id/txt_oil"
+                    style="@style/item_right_tv"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <ImageView style="@style/item_line_im1" />
+
+            <LinearLayout
+                style="@style/item_bar_ll"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    style="@style/item_left_tv"
+                    android:text="调价类型" />
+
+                <TextView
+                    android:id="@+id/txt_tjlx"
+                    style="@style/item_right_tv"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <ImageView style="@style/item_line_im1" />
+
+            <LinearLayout
+                style="@style/item_bar_ll"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    style="@style/item_left_tv"
+                    android:text="调价时间" />
+
+                <TextView
+                    android:id="@+id/txt_tjtime"
+                    style="@style/item_right_tv"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <ImageView style="@style/item_line_im1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/edit_station_baocun_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingTop="10dp"
+                    android:text="确定"
+                    android:textColor="@color/t_red"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/edit_station_diver"
+                    style="@style/item_line_im4" />
+
+                <TextView
+                    android:id="@+id/edit_station_guanbi_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingTop="10dp"
+                    android:text="取消"
+                    android:textColor="@color/t_red"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
