@@ -1,0 +1,51 @@
+Builder 模式主要用于应付 创建对象的时候，初始化参数过多的情景。
+
+Builder 模式的定义方法
+
+基本逻辑顺序是这样的：
+
+1、定义一个 静态内部类，并且 静态内部类的内部属性就是我们要赋值的属性。
+2、通过各个方法把我们要赋的值封装到静态内部类对象中，返回 this，目的是要使用链式的结构
+3、定义一个方法，创建目标对象，并且传入已经封装了各个参数的静态内部类对象。
+4、目标类定义一个参数为静态内部类的构造函数
+5、完成创建目标对象。
+
+public class InvestorPurchaseCurrentParamPackage extends  AbstractInvestorPurchaseProductsParamPackage {
+
+	public InvestorPurchaseCurrentParamPackage(Builder builder){
+		super.platformCode = builder.platformCode;
+		super.entityCode = builder.investorEntityCode;
+		super.amount = builder.amount;
+		super.profit = builder.profit;
+	}
+
+	public static class Builder{
+
+		private String platformCode;
+		private String investorEntityCode;
+		private BigDecimal amount;
+		private BigDecimal profit;
+
+		public Builder platformCode(String platformCode){
+			this.platformCode = platformCode;
+			return this;
+		}
+		public Builder investorEntityCode(String investorEntityCode){
+			this.investorEntityCode = investorEntityCode;
+			return this;
+		}
+		public Builder amount(BigDecimal amount){
+			this.amount = amount;
+			return this;
+		}
+		public Builder profit(BigDecimal profit){
+			this.profit = profit;
+			return this;
+		}
+
+		public InvestorPurchaseCurrentParamPackage build(){
+			return new InvestorPurchaseCurrentParamPackage(this);
+		}
+
+	}
+}
