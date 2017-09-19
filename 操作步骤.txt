@@ -1,0 +1,315 @@
+目前证书有以下常用文件格式：JKS(.keystore)，微软(.pfx)，PEM(.key + .crt)。其中,tomcat使用JKS格式,nginx使用PEM格式.
+
+1、用keytool生成keystore
+
+C:\Users\app>d:
+
+D:\>cd Java
+
+D:\Java>cd jdk1.8.0_45
+
+D:\Java\jdk1.8.0_45>cd bin
+
+D:\Java\jdk1.8.0_45\bin>keytool -genkeypair -alias "maran" -keyalg "RSA" -keystore "d:\https\mr.keystore"
+输入密钥库口令:123456
+再次输入新口令:
+您的名字与姓氏是什么?
+  [Unknown]:  192.168.1.137
+您的组织单位名称是什么?
+  [Unknown]:  mr
+您的组织名称是什么?
+  [Unknown]:  mr
+您所在的城市或区域名称是什么?
+  [Unknown]:  sjz
+您所在的省/市/自治区名称是什么?
+  [Unknown]:  sjz
+该单位的双字母国家/地区代码是什么?
+  [Unknown]:  zh
+CN=192.168.1.137, OU=mr, O=mr, L=sjz, ST=sjz, C=zh是否正确?
+  [否]:  y
+
+输入 <maran> 的密钥口令
+        (如果和密钥库口令相同, 按回车):
+再次输入新口令:
+
+D:\Java\jdk1.8.0_45\bin>
+
+
+第一步、使用keytool命令生成证书：
+
+keytool 
+
+-genkey 
+
+-alias tomcat(别名) 
+
+-keypass 123456(别名密码) 
+
+-keyalg RSA(算法) 
+
+-keysize 1024(密钥长度) 
+
+-validity 365(有效期，天单位) 
+
+-keystore D:/keys/tomcat.keystore(指定生成证书的位置和证书名称) 
+
+-storepass 123456(获取keystore信息的密码)
+
+keytool -genkey -alias tomcat -keypass 123456 -keyalg RSA -keysize 1024 -validity 365 -keystore D:/keys/tomcat.keystore -storepass 123456
+
+第二步：为客户端生成证书
+
+keytool 
+
+-genkey 
+
+-alias client 
+
+-keypass 123456
+
+-keyalg RSA 
+
+-storetype PKCS12 
+
+-keypass 123456 
+
+-storepass 123456 
+
+-keystore D:/keys/client.p12
+
+ 
+
+方便复制版：
+
+keytool -genkey -alias client1 -keypass 123456 -keyalg RSA -keysize 1024 -validity 365 -storetype PKCS12 -keystore D:/keys/client1.p12 -storepass 123456
+
+第三步：让服务器信任客户端证书
+
+1、
+
+由于不能直接将PKCS12格式的证书库导入，
+
+必须先把客户端证书导出为一个单独的CER文件，使用如下命令：
+
+keytool -export -alias client -keystore D:/keys/client.p12 -storetype PKCS12 -keypass 123456 -file D:/keys/client.cer
+
+注意：
+
+Keypass：指定CER文件的密码，但会被忽略，而要求重新输入
+
+2、
+
+将该文件导入到服务器的证书库，添加为一个信任证书：
+
+keytool -import -v -file D:/keys/client.cer -keystore D:/keys/tomcat.keystor
+
+e -storepass 123456
+
+完成之后通过list命令查看服务器的证书库，
+
+可以看到两个证书，一个是服务器证书，一个是受信任的客户端证书：
+
+keytool -list -v -keystore D:/keys/tomcat.keystore
+
+第四步：让客户端信任服务器证书
+
+1、
+
+由于是双向SSL认证，客户端也要验证服务器证书，
+
+因此，必须把服务器证书添加到浏览器的“受信任的根证书颁发机构”。
+
+由于不能直接将keystore格式的证书库导入，
+
+必须先把服务器证书导出为一个单独的CER文件，使用如下命令：
+
+keytool -keystore D:/keys/tomcat.keystore -export -alias tomcat6 -file D:/keys/server.cer
+
+2、
+
+双击server.cer文件，按照提示安装证书，
+
+将证书填入到“受信任的根证书颁发机构”。
+
+填入方法：
+
+打开浏览器   - 工具  -  internet选项-内容- 证书-把中级证书颁发机构里的www.localhost.com(该名称即时你前面生成证书时填写的名字与姓氏)证书导出来-再把导出来的证书导入  受信任的根颁发机构  就OK了。
+
+第五步：配置Tomcat服务器
+
+<Connector  port="8443"
+
+protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"
+
+maxThreads="150"
+
+scheme="https"
+
+secure="true"
+
+clientAuth="true"
+
+sslProtocol="TLS"
+
+keystoreFile="D:/keys/tomcat.keystore"
+
+keystorePass="123456"
+
+truststoreFile="D:/keys/tomcat.keystore"
+
+truststorePass="123456" />
+
+ 
+
+属性说明：
+
+clientAuth:设置是否双向验证，默认为false，设置为true代表双向验证
+
+keystoreFile:服务器证书文件路径
+
+keystorePass:服务器证书密码
+
+truststoreFile:用来验证客户端证书的根证书，此例中就是服务器证书
+
+truststorePass:根证书密码
+
+ 
+
+注意：
+
+① 设置clientAuth属性为True时，需要手动导入客户端证书才能访问。
+
+② 要访问https请求 需要访问8443端口，访问http请求则访问Tomcat默认端口（你自己设置的端口，默认8080）即可。
+
+③ tomcat8.5配置
+
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" SSLEnabled="true">
+        <SSLHostConfig>
+            <Certificate certificateKeystoreFile="D:/https/mr.keystore"
+			certificateKeystorePassword="123456" certificateKeyAlias="maran"
+                         type="RSA" />
+        </SSLHostConfig>
+    </Connector>
+
+ 
+
+ 
+
+总结：
+
+经过以上五步，你使用HTTPS 端口为8443 进行访问的时候 就是经过SSL信息加密，不怕被截获了。
+
+通话的双方，必须是都拥有证书的端，才能进行会话，换句话说，就是只有安装了咱证书的客户端，才能与服务器通信。
+
+ 
+
+小贴士：
+
+强制 https 访问
+
+在 tomcat /conf/web.xml 中的 </welcome- file-list> 后面加上这
+
+<login-config>    
+<!-- Authorization setting for SSL -->    
+<auth-method>CLIENT-CERT</auth-method>    
+<realm-name>Client Cert Users-only Area</realm-name>    
+</login-config>    
+<security-constraint>    
+<!-- Authorization setting for SSL -->    
+<web-resource-collection >    
+<web-resource-name >SSL</web-resource-name>    
+<url-pattern>/*</url-pattern>    
+</web-resource-collection>    
+<user-data-constraint>    
+<transport-guarantee>CONFIDENTIAL</transport-guarantee>    
+</user-data-constraint>    
+</security-constraint> 
+ 
+
+完成以上步骤后，在浏览器中输入http的访问地址也会自动转换为https了。
+
+
+
+
+双向认证
+
+
+1.生成客户端keystore,因为客户端andoird不能用keystore格式的密钥库，所以先生成jks格式，再用Portecle工具转成bks格式
+keytool -genkeypair -alias client -keyalg RSA -validity 3650 -keypass 123456 -storepass 123456 -keystore client.jks
+
+2.生成服务端keystore
+keytool -genkeypair -alias server -keyalg RSA -validity 3650 -keypass 123456 -storepass 123456 -keystore server.keystore
+
+3.导出客户端证书
+keytool -export -alias client -file client.cer -keystore client.jks -storepass 123456 
+
+4.导出服务端证书
+keytool -export -alias server -file server.cer -keystore server.keystore -storepass 123456 
+5.重点：证书交换，
+将客户端证书导入服务端keystore中，再将服务端证书导入客户端keystore中， 一个keystore可以导入多个证书，生成证书列表
+
+生成客户端信任证书库(由服务端证书生成的证书库)
+
+keytool -import -v -alias server -file E:\ssl\server.cer -keystore E:\ssl\truststore.jks -storepass 123456
+
+将客户端证书导入到服务器证书库(使得服务器信任客户端证书)
+
+keytool -import -v -alias client -file E:\ssl\client.cer -keystore E:\ssl\server.keystore -storepass 123456
+
+6.查看证书库中的全部证书
+keytool -list -keystore E:\ssl\server.keystore -storepass 123456
+7.配置服务器
+修改server.xml文件
+
+备注： - keystoreFile：指定服务器密钥库，可以配置成绝对路径，如“D:/key/server.keystore”，本例中是在Tomcat目录中创建了一个名- 称为key的文件夹，仅供参考。 - keystorePass：密钥库生成时的密码 - truststoreFile：受信任密钥库，和密钥库相同即可 - truststorePass：受信任密钥库密码
+
+8.用Portecle工具，运行protecle.jar将client.jks和truststore.jks分别转换成client.bks和truststore.bks,然后放到android客户端的assert目录下
+
+
+
+
+
+
+
+
+双向认证
+
+1、生成服务器证书库
+
+keytool -validity 365 -genkey -v -alias server -keyalg RSA -keystore D:\ssl\server.keystore -dname "CN=127.0.0.1,OU=rongyiwang,O=rongyiwang,L=Shanghai,ST=Shanghai,c=cn" -storepass 123456 -keypass 123456
+
+2、生成客户端证书库
+
+keytool -validity 365 -genkeypair -v -alias client -keyalg RSA -storetype PKCS12 -keystore D:\ssl\client.p12 -dname "CN=client,OU=rongyiwang,O=rongyiwang,L=Shanghai,ST=Shanghai,c=cn" -storepass 123456 -keypass 123456
+
+3、从客户端证书库中导出客户端证书
+
+keytool -export -v -alias client -keystore D:\ssl\client.p12 -storetype PKCS12 -storepass 123456 -rfc -file D:\ssl\client.cer
+
+4、从服务器证书库中导出服务器证书
+
+keytool -export -v -alias server -keystore D:\ssl\server.keystore -storepass 123456 -rfc -file D:\ssl\server.cer
+
+5、生成客户端信任证书库(由服务端证书生成的证书库)
+
+keytool -import -v -alias server -file D:\ssl\server.cer -keystore D:\ssl\client.truststore -storepass 123456
+
+6、将客户端证书导入到服务器证书库(使得服务器信任客户端证书)
+
+keytool -import -v -alias client -file D:\ssl\client.cer -keystore D:\ssl\server.keystore -storepass 123456
+
+7、查看证书库中的全部证书
+
+keytool -list -keystore D:\ssl\server.keystore -storepass 123456
+
+通过上面的步骤生成的证书，客户端需要用到的是client.p12(客户端证书，用于请求的时候给服务器来验证身份之用)和client.truststore(客户端证书库，用于验证服务器端身份，防止钓鱼)这两个文件.
+
+
+
+
+
+
+
+
+

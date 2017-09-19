@@ -1,0 +1,59 @@
+单向认证相对双向认证较为简单
+
+1.生成服务器keystore,一般为.jks格式（.keystore也可）
+keytool -genkeypair -alias maran -keyalg RSA -validity 3650 -keypass 123456 -storepass 123456 -keystore maran.jks
+
+2.导出服务器cer证书
+keytool -export -alias maran -file mr.cer -keystore maran.jks -storepass 123456
+
+3.配置tomcat服务器（其他服务器自行查询）
+<Connector  port="8443"
+
+protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"
+
+maxThreads="150"
+
+scheme="https"
+
+secure="true"
+
+clientAuth="true"
+
+sslProtocol="TLS"
+
+keystoreFile="D:/keys/maran.jks"
+
+keystorePass="123456"
+
+truststoreFile="D:/keys/maran.jks"
+
+truststorePass="123456" />
+
+ 
+
+属性说明：
+
+clientAuth:设置是否双向验证，默认为false，设置为true代表双向验证
+
+keystoreFile:服务器证书文件路径
+
+keystorePass:服务器证书密码
+
+truststoreFile:用来验证客户端证书的根证书，此例中就是服务器证书
+
+truststorePass:根证书密码
+
+Tomcat8.5
+
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" SSLEnabled="true">
+        <SSLHostConfig>
+            <Certificate certificateKeystoreFile="D:/https/test.jks"
+			certificateKeystorePassword="123456" certificateKeyAlias="test"
+			truststoreFile="D:/https/test.jks" truststorePassword="123456"
+                         type="RSA" />
+        </SSLHostConfig>
+    </Connector>
+
+4.将mr.cer证书文件复制到Android工程assets下 
+访问网络时读取证书文件mr.cer后访问https,详见Demo
