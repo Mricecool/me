@@ -1,0 +1,98 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.gogowan.petrochina"
+        minSdkVersion 12
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0.6"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters 'armeabi'
+        }
+        manifestPlaceholders = [
+                JPUSH_PKGNAME : applicationId,
+                JPUSH_APPKEY : "1c201e86c0729deb3e32f4c0",
+//                JPUSH_APPKEY : "e193d7a7987335301e4b05f8",//自己
+                JPUSH_CHANNEL : "20170329DEBUG",
+        ]
+    }
+    buildTypes {
+        debug {
+//            versionNameSuffix "-debug"
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+        }
+        release {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    signingConfigs {
+        def props = new Properties()
+        props.load(new FileInputStream(rootProject.file("keystore.properties")))
+        debug {
+            storeFile rootProject.file(props.keyStore)
+            storePassword props.keyStorePassword
+            keyAlias props.keyAlias
+            keyPassword props.keyAliasPassword
+        }
+        release {
+            storeFile rootProject.file(props.keyStore)
+            storePassword props.keyStorePassword
+            keyAlias props.keyAlias
+            keyPassword props.keyAliasPassword
+        }
+    }
+//    lintOptions{
+//        checkReleaseBuilds false
+//        abortOnError false
+//    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
+    testCompile 'junit:junit:4.12'
+    compile files('libs/gson-2.1.jar')
+    compile files('libs/ioidUtils.jar')
+    compile project(':MultiImageSelector')
+    compile project(':TimePicker')
+    compile project(':Volley')
+    // https://github.com/square/leakcanary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    // https://github.com/liaohuqiu/android-Ultra-Pull-To-Refresh
+    compile 'in.srain.cube:ultra-ptr:1.0.11'
+    // https://github.com/githubwing/DragPhotoView
+    compile 'com.github.githubwing:DragPhotoView:1.0.1'
+    // https://github.com/kyleduo/SwitchButton
+    compile 'com.kyleduo.switchbutton:library:1.4.5'
+    // https://github.com/H07000223/FlycoTabLayout
+    compile 'com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar'
+    // https://github.com/toanvc/FloatingActionMenu-Animation
+    compile 'com.github.toanvc:floatingactionmenu:0.8.9'
+    compile 'com.nineoldandroids:library:2.4.0'
+    // https://github.com/bumptech/glide
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.amap.api:map3d:latest.integration'
+    compile 'com.amap.api:map3d-native:latest.integration'
+    compile 'com.amap.api:location:latest.integration'
+    compile 'com.amap.api:search:latest.integration'
+    compile 'cn.jiguang.sdk:jpush:3.0.3'
+    compile 'cn.jiguang.sdk:jcore:1.1.1'
+    compile 'com.umeng.analytics:analytics:latest.integration'
+}
+
